@@ -1,115 +1,79 @@
 function new_state(values) {
   var new_state = {
-    open: false,
     floor: 0,
-    called_at: [],
-    asked_to_go_to: [],
-    nb_users: 0,
+    open: false,
+    path: []
   }
-  for (key in values) new_state[key] = values[key]
+  for (key in values) 
+    new_state[key] = values[key]
 
   return new_state
 }
 
-function called_at(state, floor) {
-  state.called_at.push(floor)
-  return state
-}
-
-function enter(state) {
-  state.nb_users ++
-  return state
-}
-
-function exit(state) {
-  state.nb_users -- 
-  return state
-}
-
-function go(state, floor) {
-  state.asked_to_go_to.push(floor)
+function call(state, floor) {
+  if (state.path.last() != floor) {
+    state.path.push(floor)
+  }
   return state
 }
 
 function next(state) {
-  if (state.open) state = close(state)
-  else if (called_at_current_floor(state)) state = open(state)
-  else if (goes_at_current_floor(state)) state = open(state)
-  else if (wish_to_go_higher(state)) state = up(state)
-  else if (wish_to_go_down(state)) state = down(state)
-  else nothing(state)
-  return state
-}
-
-function wish_to_go_higher(state) {
-  for(var i = 0; i < state.called_at.length; i++) {
-    if (state.called_at[i] > state.floor) return true
-  }
-  for(var i = 0; i < state.asked_to_go_to.length; i++) {
-    if (state.asked_to_go_to[i] > state.floor) return true
-  }
-  return false
-}
-
-function wish_to_go_down(state) {
-  for(var i = 0; i < state.asked_to_go_to.length; i++) {
-    if (state.asked_to_go_to[i] < state.floor) return true
-  }
-  for(var i = 0; i < state.called_at.length; i++) {
-    if (state.called_at[i] < state.floor) return true
-  }
-  return false
-}
-
-
-function called_at_current_floor(state) {
-  return state.called_at.contains(state.floor)
-}
-
-function goes_at_current_floor(state) {
-  return state.asked_to_go_to.contains(state.floor)
-}
-
-function open(state) {
-  state.cmd = 'OPEN'
-  state.open = true
-  state.called_at.pop(state.called_at.indexOf(state.floor))
-  state.asked_to_go_to.pop(state.called_at.indexOf(state.floor))
-  return state
-}
-
-function close(state) {
-  if (state.cmd == 'OPEN') {
-    //just opened, wait a little
-    state.cmd = 'NOTHING'
-  } else {
-    state.open = false
-    state.cmd = 'CLOSE'
-  }
-  return state
+  if (nowhere_to_go(state))  return nothing(state)
+  if (should_close(state))   return close(state)
+  if (should_open(state))    return open(state)
+  if (should_go_up(state))   return up(state)
+  if (should_go_down(state)) return down(state)
+  return nothing()
 }
 
 function nothing(state) {
-  state.cmd = 'NOTHING'
-  return state
+  return {cmd: 'NOTHING', state: state}
+}
+
+function open(state) {
+  state.path.shift()
+  state.open = true
+  return {cmd: 'OPEN', state: state}
+}
+
+function close(state) {
+  state.open = false
+  return {cmd: 'CLOSE', state: state}
 }
 
 function up(state) {
-  state.cmd = 'UP'
   state.floor ++
-  return state
+  return {cmd: 'UP', state: state}
 }
 
 function down(state) {
-  state.cmd = 'DOWN'
   state.floor --
-  return state
+  return {cmd: 'DOWN', state: state}
 }
 
 
-exports.next = next
+ 
+
+function should_open(state) {
+  return (state.floor == state.path[0])
+}
+
+function should_close(state) {
+  return state.open
+}
+
+function should_go_up(state) {
+  return state.path[0] > state.floor 
+}
+
+function should_go_down(state) {
+  return state.path[0] < state.floor 
+}
+
+function nowhere_to_go(state) {
+  return state.path.length == 0
+}
+
 exports.new_state = new_state
-exports.called_at = called_at
-exports.go = go
-exports.enter = enter
-exports.exit = exit
+exports.call = call
+exports.next = next

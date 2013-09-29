@@ -4,74 +4,46 @@ var elevator = require('./elevator.js');
 var ns = elevator.new_state
 
 require('./utils.js')
- 
+
+var state
 var next_state
+var result
 
-//never in the cave
-next_state = elevator.next(ns({floor: 0}))
-expect(next_state.cmd).not.eql('cmd', 'DOWN')
+// add next target
+next_state = elevator.call(ns({floor: 0}), 1)
+expect(next_state.path).to.eql([1])
 
-//never move with door open
-next_state = elevator.next(ns({open: true}))
-expect(next_state.cmd).not.eql('cmd', 'DOWN')
-expect(next_state.cmd).not.eql('cmd', 'UP')
+// add next target event if at floor
+next_state = elevator.call(ns({floor: 0}), 0)
+expect(next_state.path).to.eql([0])
 
-//never move if no one is waiting
-next_state = elevator.next(ns({called_at: []}))
-expect(next_state.cmd).not.eql('DOWN')
-expect(next_state.cmd).not.eql('UP')
+// do not add if already last target
+next_state = elevator.call(ns({floor: 0}), 0)
+next_state = elevator.call(next_state, 0)
+expect(next_state.path).to.eql([0])
 
-//opens when at a called at floor
-next_state = elevator.next(ns({called_at: [2], floor: 2}))
-expect(next_state.cmd).to.eql('OPEN')
-expect(next_state.open).to.be.ok()
-expect(next_state.called_at).to.eql([])
+// do not move if nowhere to go
+result = elevator.next(ns())
+expect(result.cmd).to.eql('NOTHING')
 
-//closes when opened (but with a delay)
-next_state = elevator.next(ns({open: true, floor: 1, cmd: 'OPEN'}))
-expect(next_state.cmd).to.eql('NOTHING')
-expect(next_state.open).to.be.ok()
-expect(next_state.floor).to.eql(1)
-next_state = elevator.next(next_state)
-expect(next_state.open).not.to.be.ok()
-expect(next_state.cmd).to.eql('CLOSE')
-expect(next_state.floor).to.eql(1)
+// open then close if at next floor
+state = ns({floor: 0, path: [0, 1]})
+result = elevator.next(state)
+expect(result.cmd).to.eql('OPEN')
+expect(result.state.path).to.eql([1])
 
-//opens if asked to go to this floor
-next_state = elevator.next(ns({floor: 1, asked_to_go_to: [1]}))
-expect(next_state.cmd).to.eql('OPEN')
+result = elevator.next(state)
+expect(result.cmd).to.eql('CLOSE')
+expect(result.state.open).not.to.be.ok()
 
-//goes up if asked to go or called only at a higher floor
-next_state = elevator.next(ns({floor: 1, 
-                               asked_to_go_to: [3], 
-                               called_at: [2, 4]}))
-expect(next_state.cmd).to.eql('UP')
+// goes toward next floor (UP)
+state = ns({floor: 0, path: [1, 2]})
+result = elevator.next(state)
+expect(result.cmd).to.eql('UP')
+expect(result.state.floor).to.eql(1)
 
-next_state = elevator.next(ns({floor: 5, 
-                               asked_to_go_to: [3], 
-                               called_at: [2, 4]}))
-expect(next_state.cmd).to.eql('DOWN')
-
-//can call at floor
-next_state = elevator.called_at(ns(), 2)
-expect(next_state.called_at.contains(2)).be.ok()
-
-//can ask to go to floor
-next_state = elevator.go(ns(), 2)
-expect(next_state.asked_to_go_to.contains(2)).be.ok()
-
-//a user can enter
-next_state = elevator.enter(ns())
-expect(next_state.nb_users).to.eql(1)
-
-//a user can exit
-next_state = elevator.exit(ns({nb_users: 1}))
-expect(next_state.nb_users).to.eql(0)
-
-//open if called at current floor
-next_state = elevator.called_at(ns({floor: 0, asked_to_go_to: [0]}), 0)
-next_state = elevator.next(next_state)
-expect(next_state.cmd).to.eql('OPEN')
-expect(next_state.asked_to_go_to.contains(0)).not.be.ok()
-expect(next_state.called_at.contains(0)).not.be.ok()
-
+// goes toward next floor (DOWN)
+state = ns({floor: 6, path: [1, 2]})
+result = elevator.next(state)
+expect(result.cmd).to.eql('DOWN')
+expect(result.state.floor).to.eql(5)
