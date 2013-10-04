@@ -1,0 +1,27 @@
+{
+  "name": "pgrange-story",
+  "version": "0.0.0",
+  "author": "pgrange",
+  "description": "see http://www.code-story.net/blog/posts/s03e01",
+  "scripts": {
+    "starts": "node index.js",
+    "test": "node test.js",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "not yet"
+  },
+  "dependencies": {
+    "express": "*",
+    "jade": "*"
+  },
+  "devDependencies": {
+    "expect.js": "*"
+  },
+  "license": "WTF",
+  "subdomain": "pgrange-asc",
+  "engines": {
+    "node": "0.10.x"
+  }
+}
