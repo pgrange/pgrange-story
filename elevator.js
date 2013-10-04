@@ -13,7 +13,6 @@ function new_state(values) {
 function call(state, floor) {
   if (! state.path.contains(floor)) 
     state.path.push(floor)
-  state.path.sort()
   return state
 }
 
