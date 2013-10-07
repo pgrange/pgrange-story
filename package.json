@@ -16,9 +16,6 @@
     "express": "*",
     "jade": "*"
   },
-  "devDependencies": {
-    "expect.js": "*"
-  },
   "license": "WTF",
   "subdomain": "pgrange-asc",
   "engines": {
