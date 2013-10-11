@@ -14,7 +14,6 @@
   },
   "dependencies": {
     "express": "*",
-    "jade": "*",
     "source-map-support": "*"
   },
   "license": "WTF",
