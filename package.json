@@ -14,7 +14,8 @@
   },
   "dependencies": {
     "express": "*",
-    "jade": "*"
+    "jade": "*",
+    "source-map-support": "*"
   },
   "license": "WTF",
   "subdomain": "pgrange-asc",

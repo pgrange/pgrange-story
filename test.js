@@ -1,3 +1,5 @@
+require('source-map-support').install()
+
 var assert = require('assert');
 var elevator = require('./elevator.js');
 var ns = elevator.new_state
