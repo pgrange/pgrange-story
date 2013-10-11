@@ -6,8 +6,10 @@ $ git clone git@github.com:pgrange/pgrange-story.git
 
 $ cd pgrange-story
 
-$ npm install
-
-$ node index.js
+$ make run
 
 Ready here : http://localhost:12043/
+
+To see all other build target :
+
+$ make
