@@ -8,7 +8,7 @@ new_state = (values) ->
   new_state
 
 call = (state, floor) ->
-  if (! state.path.contains(floor)) 
+  if floor not in state.path
     state.path.push(floor)
   state
 
