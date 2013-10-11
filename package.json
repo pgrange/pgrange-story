@@ -16,6 +16,10 @@
     "express": "*",
     "source-map-support": "*"
   },
+  "devDependencies": {
+    "coffee-script": "*",
+    "mocha": "*"
+  },
   "license": "WTF",
   "subdomain": "pgrange-asc",
   "engines": {
