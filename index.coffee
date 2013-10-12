@@ -41,5 +41,6 @@ log = (state) ->
   console.log('__' + state.floor + '__') 
   console.log(state.path)
 
-app.listen(12043)
-console.log("Server started")
+tcp_port = 12043
+app.listen(tcp_port)
+console.log("Server started on tcp/" + tcp_port )
